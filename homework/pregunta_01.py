@@ -118,7 +118,6 @@ def pregunta_01():
 
     #Crear carpeta output si no existe
     os.makedirs(output_path, exist_ok=True)
-    print(sets_lista)
 
     for name, data in sets_lista.items():
         df = pd.DataFrame(data)
