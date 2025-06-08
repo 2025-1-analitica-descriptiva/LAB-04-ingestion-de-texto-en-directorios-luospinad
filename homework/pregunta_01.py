@@ -6,6 +6,9 @@ Escriba el codigo que ejecute la accion solicitada en cada pregunta.
 """
 
 
+import os
+import pandas as pd
+
 def pregunta_01():
     """
     La información requerida para este laboratio esta almacenada en el
@@ -71,3 +74,59 @@ def pregunta_01():
 
 
     """
+    
+    input_path = 'files/input'
+    output_path = 'files/output'
+
+    sets_lista = {
+        "train": [],
+        "test": []
+    }
+        
+    target_lista = ['neutral', 'positive', 'negative']
+
+    current_df = ''
+    current_target = ''
+
+    # Leer cada carpeta dentro de input
+    
+    for root, dirs, files in os.walk(input_path):
+
+        folder_name = os.path.basename(root)
+        
+        # si la carpeta es test o train guardamos para seleccionar el dataset
+        if (folder_name == 'test' or folder_name == 'train'):
+            current_df = folder_name
+
+        if (folder_name in target_lista):
+            current_target = folder_name
+
+        for file in files:
+            file_path = os.path.join(root, file)
+            file_name = os.path.basename(file_path)
+            
+            with open(file_path, 'r', encoding='utf-8') as f:
+                contenido = f.read().replace('\n', ' ')
+
+            # despues de leer el contenido de cada archivo lo guardamos en el dataset correcto con su target
+            if (current_df != '' and current_target != ''):
+                sets_lista[current_df].append({
+                    "phrase": contenido,
+                    "target": current_target
+                })
+
+
+    #Crear carpeta output si no existe
+    os.makedirs(output_path, exist_ok=True)
+    print(sets_lista)
+
+    for name, data in sets_lista.items():
+        df = pd.DataFrame(data)
+        df.reset_index(inplace=True)
+        df.to_csv(os.path.join(output_path, f'{name}_dataset.csv'), index=False)
+
+
+
+
+if __name__ == "__main__":
+    pregunta_01()
